@@ -1,15 +1,12 @@
 #include <ctype.h>
 #include <stdio.h>
-int sum(int a , int b)
-{
-    return a+b;
-}
 enum Type {
     keyWord,
     ID,
     Integer,
     Operator,
-    Delimiter
+    Delimiter,
+    String
 };
 const char* keyWords[] = { "array", "boolean", "char", "else", "false", "for", "function", "if",
 								"integer", "print", "return", "string", "true", "void", "while"};
@@ -22,6 +19,10 @@ struct Token{
     char* value;
     int line ;
 };
+void printToken(struct Token token){
+    printf("%s   ,   %s" , token.value , token.type);
+
+}
 int  isItValidInteger(char * word){
     /// be smaller than  Max-64-bit integer
     for(int i=0; i<strlen(word) ; i++){
@@ -42,7 +43,7 @@ int isItKeyWord(char* word){
 }
 int isItValidID(char * word){
     if(strlen(word) > 256 ){
-        /// error
+        /// ERROR
         return;
     }
     for(int i=1; i<strlen(word) ; i++){
@@ -61,8 +62,9 @@ void recongnizer(char* word){
             token.line = line;
             token.value = (char *) malloc(strlen(word) + 1);
             strcpy(token.value , word);
+            printToken(token);
         }else{
-            /// error
+            /// ERROR
         }
     }else{
         if(isalpha(word[0]) || word[0] == '_'){
@@ -72,6 +74,7 @@ void recongnizer(char* word){
                 token.line = line;
                 token.value = (char *) malloc(strlen(word) + 1);
                 strcpy(token.value , word);
+                printToken(token);
                 return;
                 }
             if(isItValidID(word)){
@@ -80,13 +83,14 @@ void recongnizer(char* word){
                 token.line = line;
                 token.value = (char *) malloc(strlen(word) + 1);
                 strcpy(token.value , word);
+                printToken(token);
 
             }else{
-                /// error
+                /// ERROR
             }
         }
         else{
-            /// error
+            /// ERROR
         }
     }
 
@@ -117,6 +121,37 @@ int isDelimeters(char c){
     return 0;
 }
 void stringReader(FILE* file){
+    char* string = (char*) malloc(1);
+    string[0] = '/0';
+    char c;
+    while((c = fgetc(file)) != '"'){
+        if( c == EOF){
+            /// ERROR
+            return;
+        }
+        if(c == '\n'){
+            line++;
+        }
+        int n = strlen(string);
+        string = (char *) realloc (string , n + 2);
+        string[n+1] = '\0';
+        string[n] = c;
+    }
+    if(strlen(string)> 256){
+        /// ERROR
+        return;
+    }
+    struct Token token ;
+    token.type = String;
+    token.line = line;
+    token.value = (char *) malloc(strlen(string) + 1);
+    strcpy(token.value , string);
+    printToken(token);
+
+}
+void comment(int i , FILE* file){
+    /// i = 1  /* comment */
+    /// i = 2  // comment
 }
 char  operatorReader(char c , FILE* file){
     char c2 = fgetc(file);
@@ -124,6 +159,14 @@ char  operatorReader(char c , FILE* file){
     cc2[0] = c;
     cc2[1] = c2;
     cc2[2] ='\0';
+    if(strcmp(cc2 , "/*")){
+        comment(1 , file);
+        return NULL;
+    }
+    if(strcmp(cc2 , "//")){
+        comment(2 , file);
+        return NULL;
+    }
     if(isOperator2(cc2)){
         struct Token token ;
         token.type = Operator;
@@ -132,6 +175,7 @@ char  operatorReader(char c , FILE* file){
         token.value[0] = c;
         token.value[1] = c2;
         token.value[1] = '\0';
+        printToken(token);
         return NULL;
     }
     struct Token token ;
@@ -140,13 +184,14 @@ char  operatorReader(char c , FILE* file){
     token.value = (char *) malloc(2);
     token.value[0] = c;
     token.value[1] = '\0';
+    printToken(token);
     return c2;
 }
 void lexical_analysis(FILE* file){
     char c;
     char b =NULL;
     char* str =NULL;
-    while(true){
+    while(1){
         if(b == NULL){
             c = fgetc(file);
         }else{
@@ -181,6 +226,7 @@ void lexical_analysis(FILE* file){
                 token.value = (char *) malloc(2);
                 token.value[0] = c;
                 token.value[1] = '\0';
+                printToken(token);
                 }
                 continue;
             }
@@ -208,7 +254,7 @@ void lexical_analysis(FILE* file){
 }
 int main()
 {
-    FILE * file = fopen("input.txt" , "r+");
+    FILE * file = fopen("C:\input.txt" , "r+");
     lexical_analysis(file);
     return 0 ;
 }
