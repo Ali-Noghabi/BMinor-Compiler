@@ -15,6 +15,7 @@ const char* keyWords[] = { "array", "boolean", "char", "else", "false", "for", "
 								"integer", "print", "return", "string", "true", "void", "while"};
 int line = 1;
 const char operators[] = {'+' , '-' ,'!' ,'*' , '/' , '%' ,'=' ,'|' ,'^' , '<' , '>' , '&' };
+const char* operators2[] = {"++" , "--" , "!=" , "==" , "<=" , ">=" , "||" , "&&"};
 const char delimeters[]= {'(' , ')' , '[' , ']' , '{' , '}' , ',' , ';' , ':' , '\'' , '"' , '\\'};
 struct Token{
     enum Type type ;
@@ -30,6 +31,14 @@ int  isItValidInteger(char * word){
         return 0;
     }
     return 1;
+}
+int isItKeyWord(char* word){
+    for(int i=0 ; i<15 ; i++){
+        if(strcmp(word , keyWords[i])){
+            return 1;
+        }
+    }
+    return 0;
 }
 int isItValidID(char * word){
     if(strlen(word) > 256 ){
@@ -57,6 +66,14 @@ void recongnizer(char* word){
         }
     }else{
         if(isalpha(word[0]) || word[0] == '_'){
+            if(isItKeyWord(word)){
+                struct Token token ;
+                token.type = keyWord;
+                token.line = line;
+                token.value = (char *) malloc(strlen(word) + 1);
+                strcpy(token.value , word);
+                return;
+                }
             if(isItValidID(word)){
                 struct Token token ;
                 token.type = ID;
@@ -82,6 +99,15 @@ int isOperator(char c) {
     }
     return 0;
 }
+int isOperator2(char* c){
+    for(int i=0 ; i<8 ; i++){
+        if(strcmp(c , operators2[i])){
+            return 1;
+        }
+    }
+    return 0;
+
+}
 int isDelimeters(char c){
     for(int i =0 ; i < sizeof(delimeters) / sizeof(char) ; i++){
         if(c == delimeters[i]){
@@ -92,13 +118,46 @@ int isDelimeters(char c){
 }
 void stringReader(FILE* file){
 }
-void operatorReader(char c , FILE* file){
+char  operatorReader(char c , FILE* file){
+    char c2 = fgetc(file);
+    char* cc2 = (char *) malloc(3);
+    cc2[0] = c;
+    cc2[1] = c2;
+    cc2[2] ='\0';
+    if(isOperator2(cc2)){
+        struct Token token ;
+        token.type = Operator;
+        token.line = line;
+        token.value = (char *) malloc(3);
+        token.value[0] = c;
+        token.value[1] = c2;
+        token.value[1] = '\0';
+        return NULL;
+    }
+    struct Token token ;
+    token.type = Operator;
+    token.line = line;
+    token.value = (char *) malloc(2);
+    token.value[0] = c;
+    token.value[1] = '\0';
+    return c2;
 }
 void lexical_analysis(FILE* file){
     char c;
+    char b =NULL;
     char* str =NULL;
-    while((c = fgetc(file)) != EOF){
-          if(isspace(c)){
+    while(true){
+        if(b == NULL){
+            c = fgetc(file);
+        }else{
+            c = b;
+            b = NULL;
+        }
+        if(c == EOF){
+            break;
+        }
+
+        if(isspace(c)){
             if(str != NULL){
                recongnizer(str);
                str = NULL;
@@ -119,7 +178,9 @@ void lexical_analysis(FILE* file){
                 struct Token token ;
                 token.type = Delimiter;
                 token.line = line;
-                token.value = c;
+                token.value = (char *) malloc(2);
+                token.value[0] = c;
+                token.value[1] = '\0';
                 }
                 continue;
             }
@@ -128,7 +189,7 @@ void lexical_analysis(FILE* file){
                     recongnizer(str);
                     str = NULL;
                     }
-                operatorReader(c , file);
+                b = operatorReader(c , file);
                 continue;
             }
             if(str == NULL){
