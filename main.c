@@ -20,7 +20,7 @@ struct Token{
     int line ;
 };
 void printToken(struct Token token){
-    printf("%s   ,   %s" , token.value , token.type);
+    printf("%s     %s \n" , token.value , token.type);
 
 }
 int  isItValidInteger(char * word){
@@ -113,7 +113,7 @@ int isOperator2(char* c){
 
 }
 int isDelimeters(char c){
-    for(int i =0 ; i < sizeof(delimeters) / sizeof(char) ; i++){
+    for(int i =0 ; i < 12 ; i++){
         if(c == delimeters[i]){
             return 1;
         }
@@ -254,7 +254,7 @@ void lexical_analysis(FILE* file){
 }
 int main()
 {
-    FILE * file = fopen("C:\input.txt" , "r+");
+    FILE * file = fopen("input.txt" , "r+");
     lexical_analysis(file);
     return 0 ;
 }
