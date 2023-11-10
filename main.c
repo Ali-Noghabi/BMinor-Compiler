@@ -186,7 +186,8 @@ void recongnizer(char *word)
         }
         else
         {
-            /// ERROR
+            printf("ERROR : %s is not a valid integer value in line %d.\n" , word , line);
+            return;
         }
     }
     else
@@ -218,12 +219,14 @@ void recongnizer(char *word)
             }
             else
             {
-                /// ERROR
+                printf("ERROR : %s is not a valid identifier in line %d.\n" , word , line);
+                return;
             }
         }
         else
         {
-            /// ERRORfree(word);
+            printf("ERROR : %c is a invalid character in line %d.\n" , word[0] , line);
+            return;
         }
     }
     free(word);
@@ -260,13 +263,12 @@ int isKeyWord(char *word)
 }
 
 // Checks if the given word is a valid identifier.
-// Returns 1 if valid, 0 if invalid, and -1 if the length exceeds 256 characters (error).
+// Returns 1 if valid, 0 if invalid, and 0 if the length exceeds 256 characters (error).
 int isValidID(char *word)
 {
     if (strlen(word) > 256)
     {
-        /// ERROR
-        return -1;
+        return 0;
     }
     for (int i = 1; i < strlen(word); i++)
     {
@@ -401,10 +403,11 @@ char operatorReader(char c, FILE *file)
 
 void comment(int i, FILE *file)
 {
+    char c ;
+    char b = NULL;
     switch(i){
         case 1 :
-            char c ;
-            char b = NULL;
+
             while(1){
                 if(b != NULL){
                     c = b;
@@ -422,9 +425,8 @@ void comment(int i, FILE *file)
                     }
                 }
              }
-             break;;
+             break;
         case 2 :
-            char c;
             while ((c = fgetc(file)) != EOF)
             {
                 if(c == '\n'){
