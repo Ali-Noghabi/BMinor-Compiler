@@ -1,3 +1,8 @@
+/*
+Authors:
+Mohammad Hossein Ghaforian 40013021
+Ali Abdollahian Noghabi 9913062
+*/
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
