@@ -1,5 +1,9 @@
 #include <ctype.h>
 #include <stdio.h>
+
+/*
+Structures and enums
+*/
 enum Type
 {
     keyWord,
@@ -17,13 +21,80 @@ struct Token
     int line;
 };
 
+struct symbolTableElement
+{
+    struct Token token;
+    int id;
+};
+
+/*
+Functions prototype
+*/
+void lexical_analysis(FILE *file);
+void insertElement(struct Token token);
+int isTokenExists(char *value);
+char *getTokenTypeString(enum Type type);
+void printToken(struct Token token);
+int isItValidInteger(char *word);
+int isItKeyWord(char *word);
+int isItValidID(char *word);
+void recongnizer(char *word);
+int isOperator(char c);
+int isDoubleOperator(char *c);
+int isDelimeters(char c);
+void stringReader(FILE *file);
+void comment(int i, FILE *file);
+char operatorReader(char c, FILE *file);
+
 const char *keyWords[] = {"array", "boolean", "char", "else", "false", "for", "function", "if",
                           "integer", "print", "return", "string", "true", "void", "while"};
-int line = 1;
 const char operators[] = {'+', '-', '!', '*', '/', '%', '=', '|', '^', '<', '>', '&'};
-const char *operators2[] = {"++", "--", "!=", "==", "<=", ">=", "||", "&&"};
+const char *doubleOperators[] = {"++", "--", "!=", "==", "<=", ">=", "||", "&&"};
 const char delimeters[] = {'(', ')', '[', ']', '{', '}', ',', ';', ':', '\'', '"', '\\'};
+struct symbolTableElement *symbolTable;
+int tableMaxSize = 100;
+int currentSize = 1;
+int line = 1;
+int isFirst = 1;
 
+void insertElement(struct Token token)
+{
+    if (currentSize >= tableMaxSize)
+    {
+        // If the array is full, double its size using realloc
+        tableMaxSize *= 2;
+        symbolTable = (struct symbolTableElement *)realloc(symbolTable, tableMaxSize * sizeof(struct symbolTableElement));
+        if (symbolTable == NULL)
+        {
+            fprintf(stderr, "Memory reallocation failed\n");
+            exit(1);
+        }
+    }
+
+    symbolTable[currentSize].token = token;
+    symbolTable[currentSize].id = currentSize;
+    currentSize++;
+}
+
+int isTokenExists(char *value)
+{
+    for (int i = 0; i < currentSize; ++i)
+    {
+        if (strcmp(symbolTable[i].token.value, value) == 0)
+        {
+            return symbolTable[i].id;
+        }
+    }
+    return 0;
+}
+
+int main()
+{
+    symbolTable = (struct symbolTableElement *)malloc(tableMaxSize * sizeof(struct symbolTableElement));
+    FILE *file = fopen("..\\input.txt", "r+");
+    lexical_analysis(file);
+    return 0;
+}
 char *getTokenTypeString(enum Type type)
 {
     switch (type)
@@ -42,7 +113,6 @@ char *getTokenTypeString(enum Type type)
         return "String";
     }
 }
-int isFirst;
 
 void printToken(struct Token token)
 {
@@ -60,16 +130,28 @@ void printToken(struct Token token)
         }
         fclose(outputFile);
     }
-    printf("%-20s %-20s\n", token.value, getTokenTypeString(token.type));
+
+    char tokenValue[30];
+    int result = isTokenExists(token.value);
+    if (result)
+    {
+        sprintf(tokenValue, "%d", result);
+    }
+    else
+    {
+        strcpy(tokenValue, token.value);
+    }
+    printf("%-20s %-20s %-20s\n", token.value, getTokenTypeString(token.type), tokenValue);
 
     FILE *outputFile;
     outputFile = fopen("..\\output.txt", "a");
     if (outputFile != NULL)
     {
-        fprintf(outputFile, "%-20s %-20s\n", token.value, getTokenTypeString(token.type));
+        fprintf(outputFile, "%-20s %-20s %-20s\n", token.value, getTokenTypeString(token.type), tokenValue);
     }
     fclose(outputFile);
 }
+
 int isItValidInteger(char *word)
 {
     /// be smaller than  Max-64-bit integer
@@ -83,6 +165,7 @@ int isItValidInteger(char *word)
     }
     return 1;
 }
+
 int isItKeyWord(char *word)
 {
     for (int i = 0; i < 15; i++)
@@ -94,6 +177,7 @@ int isItKeyWord(char *word)
     }
     return 0;
 }
+
 int isItValidID(char *word)
 {
     if (strlen(word) > 256)
@@ -111,6 +195,7 @@ int isItValidID(char *word)
     }
     return 1;
 }
+
 void recongnizer(char *word)
 {
     if (isdigit(word[0]))
@@ -149,6 +234,10 @@ void recongnizer(char *word)
                 token.type = ID;
                 token.line = line;
                 token.value = (char *)malloc(strlen(word) + 1);
+                if (!isTokenExists(token.value))
+                {
+                    insertElement(token);
+                }
                 strcpy(token.value, word);
                 printToken(token);
             }
@@ -163,6 +252,7 @@ void recongnizer(char *word)
         }
     }
 }
+
 int isOperator(char c)
 {
     for (int i = 0; i < sizeof(operators) / sizeof(char); i++)
@@ -174,17 +264,19 @@ int isOperator(char c)
     }
     return 0;
 }
-int isOperator2(char *c)
+
+int isDoubleOperator(char *c)
 {
     for (int i = 0; i < 8; i++)
     {
-        if (!strcmp(c, operators2[i]))
+        if (!strcmp(c, doubleOperators[i]))
         {
             return 1;
         }
     }
     return 0;
 }
+
 int isDelimeters(char c)
 {
     for (int i = 0; i < 12; i++)
@@ -196,6 +288,7 @@ int isDelimeters(char c)
     }
     return 0;
 }
+
 void stringReader(FILE *file)
 {
     char *string = (char *)malloc(1);
@@ -229,11 +322,13 @@ void stringReader(FILE *file)
     strcpy(token.value, string);
     printToken(token);
 }
+
 void comment(int i, FILE *file)
 {
     /// i = 1  /* comment */
     /// i = 2  // comment
 }
+
 char operatorReader(char c, FILE *file)
 {
     char c2 = fgetc(file);
@@ -251,7 +346,7 @@ char operatorReader(char c, FILE *file)
         comment(2, file);
         return NULL;
     }
-    if (isOperator2(cc2))
+    if (isDoubleOperator(cc2))
     {
         struct Token token;
         token.type = Operator;
@@ -272,6 +367,7 @@ char operatorReader(char c, FILE *file)
     printToken(token);
     return c2;
 }
+
 void lexical_analysis(FILE *file)
 {
     char c;
@@ -353,11 +449,4 @@ void lexical_analysis(FILE *file)
             str[n] = c;
         }
     }
-}
-int main()
-{
-    isFirst = 1;
-    FILE *file = fopen("..\\input.txt", "r+");
-    lexical_analysis(file);
-    return 0;
 }

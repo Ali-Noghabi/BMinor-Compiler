@@ -1,26 +1,26 @@
 token                token_type           token_value         
 ------------------------------------------------------
-puts                 ID                  
-:                    Delimiter           
-function             keyWord             
-void                 keyWord             
-(                    Delimiter           
-s                    ID                  
-:                    Delimiter           
-string               keyWord             
-)                    Delimiter           
-;                    Delimiter           
-main                 ID                  
-:                    Delimiter           
-function             keyWord             
-integer              keyWord             
-(                    Delimiter           
-)                    Delimiter           
-=                    Operator            
-{                    Delimiter           
-puts                 ID                  
-(                    Delimiter           
-hello world          String              
-)                    Delimiter           
-;                    Delimiter           
-}                    Delimiter           
+puts                 ID                   1                   
+:                    Delimiter            :                   
+function             keyWord              function            
+void                 keyWord              void                
+(                    Delimiter            (                   
+s                    ID                   2                   
+:                    Delimiter            :                   
+string               keyWord              string              
+)                    Delimiter            )                   
+;                    Delimiter            ;                   
+main                 ID                   3                   
+:                    Delimiter            :                   
+function             keyWord              function            
+integer              keyWord              integer             
+(                    Delimiter            (                   
+)                    Delimiter            )                   
+=                    Operator             =                   
+{                    Delimiter            {                   
+puts                 ID                   1                   
+(                    Delimiter            (                   
+hello world          String               hello world         
+)                    Delimiter            )                   
+;                    Delimiter            ;                   
+}                    Delimiter            }                   
