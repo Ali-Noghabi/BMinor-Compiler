@@ -401,8 +401,37 @@ char operatorReader(char c, FILE *file)
 
 void comment(int i, FILE *file)
 {
-    /// i = 1  /* comment */
-    /// i = 2  // comment
+    switch(i){
+        case 1 :
+            char c ;
+            char b = NULL;
+            while(1){
+                if(b != NULL){
+                    c = b;
+                    b = NULL;
+                }else{
+                    c = fgetc(file);
+                }
+                if(c == EOF){
+                    return;
+                }
+                if(c == '*'){
+                    b = fgetc(file);
+                    if(b == '/'){
+                        return;
+                    }
+                }
+             }
+             break;;
+        case 2 :
+            char c;
+            while ((c = fgetc(file)) != EOF)
+            {
+                if(c == '\n'){
+                    break;
+                }
+            }
+    }
 }
 
 // Performs lexical analysis on the given file, identifying tokens and printing their information.
