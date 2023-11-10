@@ -62,8 +62,10 @@ int tableMaxSize = 100;
 int currentSize = 1;
 int line = 1;
 int isFirst = 1;
-const char *inputPath = "..\\input.txt";
-const char *outputPath = "..\\output.txt";
+const char *inputPath = "..\\input.txt"; // For Windows
+// const char *inputPath = "../input.txt";  // For Linux
+const char *outputPath = "..\\output.txt"; // For Windows
+// const char *outputPath = "../output.txt";  // For Linu
 int main()
 {
     symbolTable = (struct symbolTableElement *)malloc(tableMaxSize * sizeof(struct symbolTableElement));
