@@ -2,7 +2,7 @@
 #include <stdio.h>
 enum Type
 {
-    keyWord = 0,
+    keyWord,
     ID,
     Integer,
     Operator,
@@ -10,10 +10,11 @@ enum Type
     String
 };
 
-struct symbolTableElement
+struct Token
 {
+    enum Type type;
     char *value;
-    int id;
+    int line;
 };
 
 const char *keyWords[] = {"array", "boolean", "char", "else", "false", "for", "function", "if",
@@ -22,12 +23,7 @@ int line = 1;
 const char operators[] = {'+', '-', '!', '*', '/', '%', '=', '|', '^', '<', '>', '&'};
 const char *operators2[] = {"++", "--", "!=", "==", "<=", ">=", "||", "&&"};
 const char delimeters[] = {'(', ')', '[', ']', '{', '}', ',', ';', ':', '\'', '"', '\\'};
-struct Token
-{
-    enum Type type;
-    char *value;
-    int line;
-};
+
 char *getTokenTypeString(enum Type type)
 {
     switch (type)
@@ -46,9 +42,33 @@ char *getTokenTypeString(enum Type type)
         return "String";
     }
 }
+int isFirst;
+
 void printToken(struct Token token)
 {
-    printf("%s%*s\n", token.value, 20, getTokenTypeString(token.type));
+
+    if (isFirst)
+    {
+        isFirst = 0;
+        printf("%-20s %-20s %-20s\n------------------------------------------------------\n", "token", "token_type", "token_value");
+
+        FILE *outputFile;
+        outputFile = fopen("..\\output.txt", "w");
+        if (outputFile != NULL)
+        {
+            fprintf(outputFile, "%-20s %-20s %-20s\n------------------------------------------------------\n", "token", "token_type", "token_value");
+        }
+        fclose(outputFile);
+    }
+    printf("%-20s %-20s\n", token.value, getTokenTypeString(token.type));
+
+    FILE *outputFile;
+    outputFile = fopen("..\\output.txt", "a");
+    if (outputFile != NULL)
+    {
+        fprintf(outputFile, "%-20s %-20s\n", token.value, getTokenTypeString(token.type));
+    }
+    fclose(outputFile);
 }
 int isItValidInteger(char *word)
 {
@@ -67,7 +87,6 @@ int isItKeyWord(char *word)
 {
     for (int i = 0; i < 15; i++)
     {
-        // printf("isKeyWord %s and %s\n", word, keyWords[i]);
         if (!strcmp(word, keyWords[i]))
         {
             return 1;
@@ -96,7 +115,6 @@ void recongnizer(char *word)
 {
     if (isdigit(word[0]))
     {
-        // printf("1-isDigit: %c", word[0]);
         if (isItValidInteger(word))
         {
             struct Token token;
@@ -115,10 +133,8 @@ void recongnizer(char *word)
     {
         if (isalpha(word[0]) || word[0] == '_')
         {
-            // printf("2-isAlpha: %c\n", word[0]);
             if (isItKeyWord(word))
             {
-                // printf("3-isKeyword: %c\n", word[0]);
                 struct Token token;
                 token.type = keyWord;
                 token.line = line;
@@ -129,15 +145,12 @@ void recongnizer(char *word)
             }
             if (isItValidID(word))
             {
-                // printf("4-isValidId: %s\n", word);
                 struct Token token;
                 token.type = ID;
                 token.line = line;
                 token.value = (char *)malloc(strlen(word) + 1);
                 strcpy(token.value, word);
-                // printf("5-isValidIdMiddle: %s\n", word);
                 printToken(token);
-                // printf("5-isValidIdEnd: %s\n", word);
             }
             else
             {
@@ -343,6 +356,7 @@ void lexical_analysis(FILE *file)
 }
 int main()
 {
+    isFirst = 1;
     FILE *file = fopen("..\\input.txt", "r+");
     lexical_analysis(file);
     return 0;
