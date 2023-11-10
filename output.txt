@@ -1,26 +1,26 @@
 token                token_type           token_value         
 ------------------------------------------------------
 puts                 ID                   1                   
-:                    Delimiter            :                   
-function             keyWord              function            
-void                 keyWord              void                
-(                    Delimiter            (                   
+:                    delimiters           :                   
+function             keywords             function            
+void                 keywords             void                
+(                    delimiters           (                   
 s                    ID                   2                   
-:                    Delimiter            :                   
-string               keyWord              string              
-)                    Delimiter            )                   
-;                    Delimiter            ;                   
+:                    delimiters           :                   
+string               keywords             string              
+)                    delimiters           )                   
+;                    delimiters           ;                   
 main                 ID                   3                   
-:                    Delimiter            :                   
-function             keyWord              function            
-integer              keyWord              integer             
-(                    Delimiter            (                   
-)                    Delimiter            )                   
-=                    Operator             =                   
-{                    Delimiter            {                   
+:                    delimiters           :                   
+function             keywords             function            
+integer              keywords             integer             
+(                    delimiters           (                   
+)                    delimiters           )                   
+=                    operators            =                   
+{                    delimiters           {                   
 puts                 ID                   1                   
-(                    Delimiter            (                   
-hello world          String               hello world         
-)                    Delimiter            )                   
-;                    Delimiter            ;                   
-}                    Delimiter            }                   
+(                    delimiters           (                   
+hello world          STRING               hello world         
+)                    delimiters           )                   
+;                    delimiters           ;                   
+}                    delimiters           }                   
