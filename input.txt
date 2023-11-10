@@ -1,5 +1,7 @@
 puts: function void ( s: string );
-
-main: function integer () = {
+/* commit test*/
+/* commit test2
+.....*/
+main: function integer () = {//test commit3
     puts("hello world");
-}
+}//test commit4 //*test*/
