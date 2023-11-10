@@ -424,6 +424,9 @@ void comment(int i, FILE *file)
                         return;
                     }
                 }
+                if(c == '\n'){
+                    line++;
+                }
              }
              break;
         case 2 :
