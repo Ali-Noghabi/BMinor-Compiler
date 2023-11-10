@@ -1,0 +1,24 @@
+puts                  ID
+:           Delimiter
+function             keyWord
+void             keyWord
+(           Delimiter
+s                  ID
+:           Delimiter
+string             keyWord
+)           Delimiter
+;           Delimiter
+main                  ID
+:           Delimiter
+function             keyWord
+integer             keyWord
+(           Delimiter
+)           Delimiter
+=            Operator
+{           Delimiter
+puts                  ID
+(           Delimiter
+hello world              String
+)           Delimiter
+;           Delimiter
+}           Delimiter
